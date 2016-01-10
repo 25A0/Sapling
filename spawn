@@ -1,5 +1,8 @@
 #! /bin/sh
 
+template_path=~/.sapling/templates
+install_dir=`dirname $0`
+
 # =========================================================== #
 # ======================== FUNCTIONS ======================== #
 # =========================================================== #
@@ -13,7 +16,10 @@ Usage:
 		Spawns a new <template>.
 		If <dest> is specified, the files will be stored in <dest>.
 		Otherwise the files will be stored in the current directory.
-		
+	
+	spawn [-l | --list]
+		Lists all known templates
+
 	spawn -h | --help
 		Prints this help message.
 
@@ -78,6 +84,15 @@ EOF
     eval "$1=${val}"
 }
 
+f_list_templates()
+{
+	echo "Known templates:"
+	echo ${template_path}:
+	ls -1 ${template_path}
+	echo ${install_dir}/templates:
+	ls -1 ${install_dir}/templates
+}
+
 f_before()
 {
 	# Default implementations of before function. Does nothing.
@@ -102,6 +117,9 @@ while [ "$1" != "" ]; do
         -h | --help )           f_usage
                                 exit
                                 ;;
+        -l | --list )			f_list_templates
+								exit
+								;;
         --* )					echo "error: unknown option $1"
 								f_usage
 								exit 1
@@ -126,8 +144,6 @@ fi
 # Search for the given template.
 # Search paths are the current directory,
 # ~/.sapling/templates, and $0/templates
-template_path=~/.sapling/templates
-install_dir=`dirname $0`
 if [[ -d ${template} ]]; then
 	src=`pwd`/${template}
 elif [[ -d ${template_path}/${template} ]]; then
@@ -137,6 +153,7 @@ elif [[ -d ${install_dir}/templates/${template} ]]; then
 else
 	echo "error: could not find template '${template}' in"
 	echo "current directory, in '${template_path}', or in '${install_dir}/templates'."
+	f_list_templates
 	exit 1
 fi
 

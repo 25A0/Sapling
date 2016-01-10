@@ -36,6 +36,11 @@ These are the templates that are included in this repo:
 	and a `run.sh` for running the program.
 - `template`: Helps you to define new templates.
 
+In order to see a list of all known templates, run
+```
+	% spawn -l
+```
+
 ## Define new templates
 
 You will probably want to define your own templates.
