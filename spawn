@@ -1,0 +1,177 @@
+#! /bin/sh
+
+# =========================================================== #
+# ======================== FUNCTIONS ======================== #
+# =========================================================== #
+
+# Print help
+f_usage()
+{
+	cat <<EOF
+Usage: 
+	spawn [-v | --verbose] <template> [<dest>]
+		Spawns a new <template>.
+		If <dest> is specified, the files will be stored in <dest>.
+		Otherwise the files will be stored in the current directory.
+		
+	spawn -h | --help
+		Prints this help message.
+
+For more infos, visit
+	https://github.com/25A0/Sapling
+EOF
+}
+
+# Ask user to input the value of a boolean
+f_ask_boolean()
+{
+	if [[ -z $1 ]]; then
+		cat <<EOF
+Usage: 
+	f_ask_boolean <variable> [<question>]
+Where <variable> is the name of the variable that will
+be set depending on the user's input, and <question>
+is a prompt that provides additional information about
+the meaning of <variable>.
+EOF
+		exit 1
+	fi
+	if [[ -z $2 ]]; then
+		p="Enable $1 [yn]?"
+	else
+		p=$2
+	fi
+	while true; do
+	    read -p "$p " yn
+	    case $yn in
+	        [Yy]* ) eval "$1=1"
+					break
+					;;
+	        [Nn]* ) eval "$1="
+					break
+					;;
+	        * ) 	echo "Please answer yes or no.";;
+	    esac
+	done
+}
+
+# Ask the user to input a value
+f_ask()
+{
+	if [[ -z $1 ]]; then
+		cat <<EOF
+Usage: 
+	f_ask <variable> [<question>]
+Where <variable> is the name of the variable that will
+be set to the value specified by the user, and <question>
+is a prompt that provides additional information about
+the meaning of <variable>.
+EOF
+		exit 1
+	fi
+	if [[ -z $2 ]]; then
+		p="Value of $1:"
+	else
+		p=$2
+	fi
+    read -p "$p " val
+    eval "$1=${val}"
+}
+
+f_before()
+{
+	# Default implementations of before function. Does nothing.
+	return
+}
+
+f_after()
+{
+	# Default implementations of after function. Does nothing.
+	return
+}
+
+# =========================================================== #
+# =========================================================== #
+# =========================================================== #
+
+# Check passed arguments for options and switches
+while [ "$1" != "" ]; do
+    case $1 in
+        -v | --verbose )        verbose=-v
+                                ;;
+        -h | --help )           f_usage
+                                exit
+                                ;;
+        --* )					echo "error: unknown option $1"
+								f_usage
+								exit 1
+								;;
+        -* )					echo "error: unknown switch $1"
+								f_usage
+								exit 1
+								;;
+        * )                     template=$1
+								shift
+								break
+    esac
+    shift
+done
+
+# If no template name was specified, print help and exit
+if [[ -z ${template} ]]; then
+	f_usage
+	exit 1
+fi
+
+# Search for the given template.
+# Search paths are the current directory,
+# ~/.sapling/templates, and $0/templates
+template_path=~/.sapling/templates
+install_dir=`dirname $0`
+if [[ -d ${template} ]]; then
+	src=`pwd`/${template}
+elif [[ -d ${template_path}/${template} ]]; then
+	src=${template_path}/${template}
+elif [[ -d ${install_dir}/templates/${template} ]]; then
+	src=${install_dir}/templates/${template}
+else
+	echo "error: could not find template '${template}' in"
+	echo "current directory, in '${template_path}', or in '${install_dir}/templates'."
+	exit 1
+fi
+
+if [[ ${verbose} ]]; then
+	echo "Using template ${src}"
+fi
+
+# Attempt to load config script that might contain custom
+# code that has to be executed before or after spawning
+if [[ -f ${src}/config.sh ]]; then
+	source ${src}/config.sh
+fi
+
+# If another argument is passed, treat it as the destination
+if [[ -n $1 ]]; then
+	dest=$1
+fi
+
+# Execute "before" code. Either default implementation
+# or the one found in ${src}/config.sh
+f_before
+	
+# If ${dest} is still not set, use `pwd`.
+if [[ -z ${dest} ]]; then
+	dest=`pwd`
+fi
+if [[ ${verbose} ]]; then
+	echo "Copying files to ${dest}"
+fi
+
+# Copy files to ${dest}, but ask if any files would
+# be overridden.
+mkdir -p ${dest}
+cp -Ri ${verbose} ${src}/files/* ${dest}
+
+# Execute "after" code. Either default implementation
+# or the one found in ${src}/config.sh
+f_after
