@@ -1,0 +1,116 @@
+.Dd January 15, 2016
+.Dt SPAWN 1
+.Os 
+.Sh NAME
+.Nm spawn
+.Nd a lightweight tool to get started with new projects
+.Sh SYNOPSIS
+.Nm
+.Op Fl -verbose | v
+.Ar template
+.Op Ar dest
+.Nm
+.Fl -list | l
+.Nm
+.Op Fl -help | h
+.Sh DESCRIPTION
+.Nm
+creates a new instance of a
+.Ar template
+project.
+.Pp
+If
+.Ar dest
+is provided, the files will be created in
+.Ar dest .
+For this,
+.Ar dest
+will be created if it does not exist.
+In case
+.Ar dest
+is not provided, the 
+.Ar template
+files will be created in the current directory.
+.Pp
+For more information, visit
+https://github.com/25A0/Sapling.
+.Sh OPTIONS
+The following options are available:
+.Bl -tag -width indent
+.It Ar template
+Use the template
+.Ar template
+to determine which files need to be created.
+.Pp
+This can be either an absolute path, or a template that exist either in
+the current working directory, in
+.Pa ~/.sapling/templates ,
+or in the directory where
+.Nm
+is located.
+.It Ar dest
+Create all files in
+.Ar dest .
+.It Fl l , -list
+List all available templates.
+.It Fl v , -verbose
+Print verbose output.
+.It Fl h , -help
+Show this help page.
+.El
+.Sh EXAMPLES
+.Ss Built-in templates
+.Bl -bullet
+.It
+Start a new Java project:
+.Dl % spawn Java
+This will set up files and directories for a new Java project.
+This includes a GNU Makefile to compile the code, a Main class containing a main method,
+and a bash script to start the compiled program.
+.Pp
+Note that, since no
+.Ar dest
+directory is given, the files will be created in the current working directory.
+.It
+Create a new bare-bones LaTeX document in a specific directory:
+.Dl % spawn LaTeX ~/Documents/foo/
+This will create a new LaTeX document in
+.Pa ~/Documents/foo ,
+along with a Makefile to compile the document.
+.El
+.Ss Define new templates
+Create a new template:
+.Bl -enum
+Spawn a new template:
+.Dl % spawn template
+You will need to enter a name for the template.
+Choose a name that describes the kind of project that the new template will set up
+(e.g.
+.Cm python ,
+.Cm website ,
+.Cm tax-return ,
+.Cm world-domination ... ) .
+.Pp
+By default, the new template is stored in
+.Pa ~/.sapling/templates .
+In there you should now find a directory for your newly created template. It contains a directory files and a file
+.Pa config.sh .
+.Pp
+The content of
+.Pa files
+is what Sapling will clone when you use this template.
+For example, the files directory of the LaTeX template contains the bare-bones
+.tex file and a Makefile to compile the document.
+.Pp
+Which files you need for your new template depends of course on the project type and your workflow.
+A straightforward approach is to take an existing instance of this project type,
+copy it to the files folder of your template,
+and strip it down to the essential parts.
+.Pp
+If you need to customize the template files, you can edit and expand
+.Pa config.sh .
+Take a look at the
+.Cm template
+template for a simple example.
+.Sh AUTHOR
+.An Moritz Neikes

@@ -7,7 +7,7 @@ install_dir=`dirname $0`
 # ======================== FUNCTIONS ======================== #
 # =========================================================== #
 
-# Print help
+# Print short help
 f_usage()
 {
 	cat <<EOF
@@ -21,11 +21,17 @@ Usage:
 		Lists all known templates
 
 	spawn -h | --help
-		Prints this help message.
+		Show complete help page.
 
 For more infos, visit
 	https://github.com/25A0/Sapling
 EOF
+}
+
+# Show man page
+f_manpage()
+{
+	man ${install_dir}/spawn.1
 }
 
 # Ask user to input the value of a boolean
@@ -114,7 +120,7 @@ while [ "$1" != "" ]; do
     case $1 in
         -v | --verbose )        verbose=-v
                                 ;;
-        -h | --help )           f_usage
+        -h | --help )           f_manpage
                                 exit
                                 ;;
         -l | --list )			f_list_templates
