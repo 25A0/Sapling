@@ -145,7 +145,7 @@ fi
 # Search paths are the current directory,
 # ~/.sapling/templates, and $0/templates
 if [[ -d ${template} ]]; then
-	src=`pwd`/${template}
+	src=${template}
 elif [[ -d ${template_path}/${template} ]]; then
 	src=${template_path}/${template}
 elif [[ -d ${install_dir}/templates/${template} ]]; then
