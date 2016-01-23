@@ -111,6 +111,7 @@ f_process_regular()
 
 f_copy()
 {
+	mkdir -p `dirname "$2"`
 	cp -Ri ${verbose} "$1" "$2"
 }
 
