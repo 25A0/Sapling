@@ -111,8 +111,32 @@ f_process_regular()
 
 f_copy()
 {
-	mkdir -p `dirname "$2"`
+	mkdir -p "`dirname \"$2\"`"
 	cp -Ri ${verbose} "$1" "$2"
+}
+
+f_include()
+{
+	if [[ -z $1 ]]; then
+		cat <<EOF
+Usage:
+	f_include <file> [<name>]
+Where <file> is a file in the `include` folder of the chosen
+template. If <name> is defined, the file will be copied to ${dest}/<name>.
+EOF
+		exit 1
+	fi
+	if [[ ! -f "${src}/include/$1" ]]; then
+		echo "error: ${src}/include/$1: no such file or directory"
+		exit 1
+	fi
+	if [[ -z "$2" ]]; then
+		local dest="${dest}/$1"
+	else
+		local dest="${dest}/$2"
+	fi
+	eval "include_src+=(\"${src}/include/$1\")"
+	eval "include_dest+=(\"${dest}\")"
 }
 
 f_before()
@@ -210,6 +234,9 @@ fi
 # be overridden.
 mkdir -p ${dest}
 find "${src}/files" -type f | while read file; do f_process_regular "${file}"; done
+for (( i = 0; i < ${#include_src[@]}; i++ )); do
+	f_process "${include_src[i]}" "${include_dest[i]}"
+done
 
 # Execute "after" code. Either default implementation
 # or the one found in ${src}/config.sh
