@@ -7,7 +7,7 @@ f_before()
 
 	# If dest was not set explicitly, set it to the default location.
 	if [[ -z ${dest} ]]; then
-		dest=${template_path}/${templatename}/
+		dest="${template_path}/${templatename}/"
 		echo "Storing template in default location ${dest}"
 	fi
 }
@@ -18,7 +18,7 @@ f_after()
 	# You may ask why I didn't simply add an empty `files`
 	# folder to the `files` directory of the `template` template?
 	# Because you cannot add empty directories to git repos, that's why.
-	mkdir -p ${dest}/files
+	mkdir -p "${dest}/files"
 	
 	cat <<EOF
 You can now specify which files should be created whenever
@@ -27,7 +27,7 @@ Leave this blank to skip this step.
 EOF
 	f_ask template_files "Specify path to template files:"
 	if [[ -n ${template_files} ]]; then
-		cp -R ${template_files}/* ${dest}/files/
+		cp -R "${template_files}/*" "${dest}/files/"
 	fi
 
 	cat <<EOF

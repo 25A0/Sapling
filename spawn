@@ -1,7 +1,7 @@
 #! /bin/sh
 
-template_path=~/.sapling/templates
-install_dir=`dirname $0`
+template_path="~/.sapling/templates"
+install_dir="`dirname $0`"
 
 # =========================================================== #
 # ======================== FUNCTIONS ======================== #
@@ -31,7 +31,7 @@ EOF
 # Show man page
 f_manpage()
 {
-	man ${install_dir}/spawn.1
+	man "${install_dir}/spawn.1"
 }
 
 # Ask user to input the value of a boolean
@@ -93,10 +93,25 @@ EOF
 f_list_templates()
 {
 	echo "Known templates:"
-	echo ${template_path}:
-	ls -1 ${template_path}
-	echo ${install_dir}/templates:
-	ls -1 ${install_dir}/templates
+	echo "${template_path}:"
+	ls -1 "${template_path}"
+	echo "${install_dir}/templates:"
+	ls -1 "${install_dir}/templates"
+}
+
+f_process()
+{
+	f_copy "$1" "$2"
+}
+
+f_process_regular()
+{
+	f_process "$1" "`echo $1 | sed -e \"s|${src}/files/|${dest}/|g\"`"
+}
+
+f_copy()
+{
+	cp -Ri ${verbose} "$1" "$2"
 }
 
 f_before()
@@ -134,7 +149,7 @@ while [ "$1" != "" ]; do
 								f_usage
 								exit 1
 								;;
-        * )                     template=$1
+        * )                     template="$1"
 								shift
 								break
     esac
@@ -150,12 +165,12 @@ fi
 # Search for the given template.
 # Search paths are the current directory,
 # ~/.sapling/templates, and $0/templates
-if [[ -d ${template} ]]; then
-	src=${template}
-elif [[ -d ${template_path}/${template} ]]; then
-	src=${template_path}/${template}
-elif [[ -d ${install_dir}/templates/${template} ]]; then
-	src=${install_dir}/templates/${template}
+if [[ -d "${template}" ]]; then
+	src="${template}"
+elif [[ -d "${template_path}/${template}" ]]; then
+	src="${template_path}/${template}"
+elif [[ -d "${install_dir}/templates/${template}" ]]; then
+	src="${install_dir}/templates/${template}"
 else
 	echo "error: could not find template '${template}' in"
 	echo "current directory, in '${template_path}', or in '${install_dir}/templates'."
@@ -169,13 +184,13 @@ fi
 
 # Attempt to load config script that might contain custom
 # code that has to be executed before or after spawning
-if [[ -f ${src}/config.sh ]]; then
-	source ${src}/config.sh
+if [[ -f "${src}/config.sh" ]]; then
+	source "${src}/config.sh"
 fi
 
 # If another argument is passed, treat it as the destination
 if [[ -n $1 ]]; then
-	dest=$1
+	dest="$1"
 fi
 
 # Execute "before" code. Either default implementation
@@ -193,7 +208,7 @@ fi
 # Copy files to ${dest}, but ask if any files would
 # be overridden.
 mkdir -p ${dest}
-cp -Ri ${verbose} ${src}/files/* ${dest}
+find "${src}/files" -type f | while read file; do f_process_regular "${file}"; done
 
 # Execute "after" code. Either default implementation
 # or the one found in ${src}/config.sh
