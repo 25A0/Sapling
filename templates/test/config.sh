@@ -45,6 +45,7 @@ f_after()
 	fi
 	f_test_regular_file "test.txt"
 	f_test_regular_file "filename with spaces.txt"
+	f_test_regular_file ".hiddenfile"
 	
 	# Note that this function must not be completely empty,
 	# hence the `return` statement.
