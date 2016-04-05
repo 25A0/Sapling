@@ -93,6 +93,10 @@ EOF
 f_list_templates()
 {
 	echo "Known templates:"
+	if [[ -d "./.sapling-templates" ]]; then
+		echo "./.sapling-templates:"
+		ls -1 "./.sapling-templates"
+	fi
 	echo "${template_path}:"
 	ls -1 "${template_path}"
 	echo "${install_dir}/templates:"
@@ -189,9 +193,12 @@ fi
 
 # Search for the given template.
 # Search paths are the current directory,
+# the directory ./.sapling-templates,
 # ~/.sapling/templates, and $0/templates
 if [[ -d "${template}" ]]; then
 	src="${template}"
+elif [[ -d "./.sapling-templates/${template}" ]]; then
+	src="./.sapling-templates/${template}"
 elif [[ -d "${template_path}/${template}" ]]; then
 	src="${template_path}/${template}"
 elif [[ -d "${install_dir}/templates/${template}" ]]; then
